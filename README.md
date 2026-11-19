@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- index.html · ПНР Контроль v2.1 — заказчики + синхронизация команды через Supabase. Один файл, заменить целиком. -->
+<!-- index.html · ПНР Контроль v2.2 — заказчики + примечания к видам работ + синхронизация команды. Один файл, заменить целиком. -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -27,7 +27,7 @@
 [hidden]{display:none!important}html.lock{overflow:hidden}
 body{font:15px/1.45 var(--fb);color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg0) 70%);min-height:100dvh;overflow-x:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
-input,select{font:inherit}
+input,select,textarea{font:inherit}
 svg.i{width:18px;height:18px;flex:none;display:block}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -168,6 +168,14 @@ main{padding:12px 0 120px}
 .wt b{flex:1;min-width:0;font:700 13px var(--fb);overflow-wrap:anywhere}
 .x{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:7px;color:var(--faint);opacity:.7}
 .x svg{width:12px;height:12px}.x:hover{opacity:1;color:var(--red);background:rgba(255,93,93,.12)}
+.nt{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:7px;color:var(--faint);opacity:.7;transition:.2s}
+.nt svg{width:13px;height:13px}.nt:hover{opacity:1;color:var(--cyan);background:rgba(43,217,255,.12)}
+.nt.has{color:var(--cyan);opacity:1}
+.wnote{display:flex;align-items:flex-start;gap:7px;width:100%;margin-top:8px;padding:8px 10px;border-radius:10px;
+ background:rgba(43,217,255,.07);border:1px solid rgba(43,217,255,.22);color:var(--dim);font-size:12px;line-height:1.4;text-align:left;transition:.2s}
+.wnote svg{width:14px;height:14px;color:var(--cyan);margin-top:1px;flex:none}
+.wnote span{overflow-wrap:anywhere;white-space:pre-wrap}
+.wnote:hover{border-color:rgba(43,217,255,.5);background:rgba(43,217,255,.11)}
 .per{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 8px}
 .av{width:22px;height:22px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 9px var(--fm);color:var(--c);background:var(--cs);border:1px solid var(--cb)}
 .av.no,.nm.no{color:var(--amber);border-color:rgba(255,178,36,.55)}
@@ -235,7 +243,8 @@ main{padding:12px 0 120px}
 .f>span svg{width:12px;height:12px}
 .f input,.f select{width:100%;height:44px;border-radius:12px;border:1px solid var(--ln);background:var(--fld);color:var(--ink);font-size:16px;padding:0 12px}
 .f select{appearance:none;cursor:pointer;padding-right:31px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' viewBox='0 0 24 24' fill='none' stroke='%239FB0CC' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
-.f input:focus,.f select:focus{outline:none;border-color:rgba(43,217,255,.55);box-shadow:0 0 0 3px rgba(43,217,255,.14)}
+.f textarea{width:100%;min-height:120px;border-radius:12px;border:1px solid var(--ln);background:var(--fld);color:var(--ink);font-size:16px;padding:11px 12px;resize:vertical;line-height:1.45}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:rgba(43,217,255,.55);box-shadow:0 0 0 3px rgba(43,217,255,.14)}
 .f input.bad{border-color:rgba(255,93,93,.65);animation:sk .3s}
 @keyframes sk{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .err{display:block;font:600 11px var(--fb);color:var(--red);margin-top:5px}
@@ -333,6 +342,7 @@ main{padding:12px 0 120px}
 <symbol id="pen" viewBox="0 0 24 24"><path d="M4 20h4L20 8a2.4 2.4 0 0 0-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
 <symbol id="del" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-1 13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 7m4 4v6m4-6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="note" viewBox="0 0 24 24"><path d="M5 4h14v12l-4 4H5V4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 20v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9h8M8 12.5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
 <symbol id="play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.4 16.2 12 10 15.6z" fill="currentColor"/></symbol>
 <symbol id="flag" viewBox="0 0 24 24"><path d="M6 21V4h11.5l-2.2 3.6L17.5 11H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v5h5M8.6 13.2h6.8M8.6 16.6h4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -433,7 +443,7 @@ main{padding:12px 0 120px}
      <label class="f"><span><svg class="i"><use href="#flag"/></svg>Окончание производства работ</span><input id="fEnd" type="date"></label>
     </div><span class="err" id="fDateErr" hidden>Окончание раньше начала</span></div>
    <div class="sec" id="wSec" tabindex="-1"><h4>Виды работ на объекте</h4>
-    <p>Отметьте только те виды, что входят в комплекс, и назначьте ответственных. «Отчёт выдан» ставится на карточке.</p>
+    <p>Отметьте только те виды, что входят в комплекс, и назначьте ответственных. «Отчёт выдан» и примечания ставятся на карточке.</p>
     <div class="wtl" id="fWorks"></div>
     <div class="addt"><input id="nCode" type="text" placeholder="Код, напр. РЗА" maxlength="10" autocomplete="off" aria-label="Код нового вида работ">
      <input id="nTitle" type="text" placeholder="Название вида работ" maxlength="48" autocomplete="off" aria-label="Название">
@@ -443,6 +453,21 @@ main{padding:12px 0 120px}
    <div class="sp"></div><button type="button" class="gh big" data-act="close">Отмена</button>
    <button type="submit" class="pri" id="oSave" style="height:42px">Добавить объект</button></div>
  </form>
+</div>
+
+<div class="scr" id="sNote" hidden>
+ <div class="sh nw" role="dialog" aria-modal="true" aria-labelledby="ntT">
+  <div class="hd"></div>
+  <div class="shh"><div><h2 id="ntT">Примечание</h2><p id="ntSub"></p></div>
+   <button type="button" class="ib sm" data-act="close" aria-label="Закрыть"><svg class="i"><use href="#x"/></svg></button></div>
+  <div class="shb">
+   <label class="f"><span><svg class="i"><use href="#note"/></svg>Текст примечания</span>
+    <textarea id="ntText" rows="5" maxlength="500" placeholder="Например: категория системы II, особое требование заказчика, № схемы…" aria-label="Текст примечания"></textarea></label>
+  </div>
+  <div class="shf"><button type="button" class="gh big" data-act="noteclear">Очистить</button>
+   <div class="sp"></div><button type="button" class="gh big" data-act="close">Отмена</button>
+   <button type="button" class="pri" data-act="notesave" style="height:42px">Сохранить</button></div>
+ </div>
 </div>
 
 <div class="scr" id="sCust" hidden>
@@ -480,7 +505,6 @@ main{padding:12px 0 120px}
      <label class="sw"><input type="checkbox" id="withData" checked><i></i><span id="wdLabel">Включить текущие данные</span></label>
      <button class="pri" data-act="portable" style="width:100%;height:42px"><svg class="i"><use href="#dn"/></svg>Скачать автономный .html</button></div>
    </div>
-
    <div data-pane="offline" hidden><div id="offRows"></div>
     <div class="ag"><button class="gh big" data-act="checkupd"><svg class="i"><use href="#rfr"/></svg>Проверить обновления</button>
      <button class="gh big" data-act="persist"><svg class="i"><use href="#shl"/></svg>Защитить данные</button>
@@ -488,7 +512,6 @@ main{padding:12px 0 120px}
      <button class="gh big wide" data-act="rebuild"><svg class="i"><use href="#cld"/></svg>Пересобрать офлайн-копию</button></div>
     <div class="note dm"><svg class="i"><use href="#cld"/></svg><span>Офлайн на телефоне включается файлом <b>sw.js</b> рядом с index.html. Без него приложение всё равно работает, а для компьютера есть автономный .html.</span></div>
    </div>
-
    <div data-pane="sync" hidden>
     <div class="kv"><span>Статус базы</span><b id="syncStat" class="dm">не настроена</b></div>
     <label class="sw"><input type="checkbox" id="syncOn"><i></i><span>Общая база для команды (синхронизация)</span></label>
@@ -504,7 +527,7 @@ main{padding:12px 0 120px}
       <input class="tlink" id="teamLink" type="text" readonly>
       <span class="ag" style="margin-top:8px"><button class="gh big wide" data-act="copyTeam"><svg class="i"><use href="#shr"/></svg>Скопировать ссылку</button></span>
      </span></div>
-    <div class="note dm"><svg class="i"><use href="#cld"/></svg><span>Все, кто откроет эту ссылку, видят одни и те же объекты и могут отмечать «Выполнено» и «Отчёт выдан». Изменения появляются у остальных в течение нескольких секунд. Локальная копия тоже сохраняется, поэтому без интернета приложение продолжает работать.</span></div>
+    <div class="note dm"><svg class="i"><use href="#cld"/></svg><span>Все, кто откроет эту ссылку, видят одни и те же объекты и могут отмечать «Выполнено», «Отчёт выдан» и писать примечания. Изменения появляются у остальных в течение нескольких секунд. Локальная копия тоже сохраняется, поэтому без интернета приложение продолжает работать.</span></div>
     <div class="sec"><h4>Как настроить базу (однократно, 5 минут)</h4>
      <div class="note dm"><svg class="i"><use href="#db"/></svg><span><ol>
       <li>Зарегистрируйтесь на <b>supabase.com</b> (бесплатно) и создайте проект. Придумайте пароль базы и выберите регион.</li>
@@ -518,7 +541,6 @@ main{padding:12px 0 120px}
      <button class="gh big" data-act="copySql"><svg class="i"><use href="#up"/></svg>Скопировать SQL</button>
     </div>
    </div>
-
    <div data-pane="data" hidden><div id="dataRows"></div>
     <div class="ag"><button class="gh big" data-act="export"><svg class="i"><use href="#dn"/></svg>Экспорт JSON</button>
      <button class="gh big" data-act="import"><svg class="i"><use href="#up"/></svg>Импорт JSON</button>
@@ -548,7 +570,7 @@ window.addEventListener('error',function(e){try{window.__PNR.err.push((e.message
 <script>
 (function(){
 'use strict';
-var V='2.1.0',K={d:'pnr-objects-v1',u:'pnr-ui-v2',t:'pnr-types-v1',m:'pnr-meta-v1',s:'pnr-sync-v1'};
+var V='2.2.0',K={d:'pnr-objects-v1',u:'pnr-ui-v2',t:'pnr-types-v1',m:'pnr-meta-v1',s:'pnr-sync-v1'};
 var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 var ic=function(n,c){return '<svg class="i '+(c||'')+'" aria-hidden="true"><use href="#'+n+'"/></svg>'};
@@ -601,7 +623,7 @@ function stage(o){var ks=keys(o);if(!ks.length)return'none';
  return ad&&ar?'closed':(ad?'reports':'work')}
 var closed=function(o){return stage(o)==='closed'};
 function sync(o){o.closedAt=closed(o)?(o.closedAt||today()):null}
-function nw(w){w=w||{};return{person:w.person||'',done:!!w.done,doneAt:w.doneAt||null,report:!!w.report,reportAt:w.reportAt||null}}
+function nw(w){w=w||{};return{person:w.person||'',done:!!w.done,doneAt:w.doneAt||null,report:!!w.report,reportAt:w.reportAt||null,note:w.note||''}}
 function norm(o){
  if(!o||typeof o!=='object')return null;
  var was=!!o.closedAt,src=(o.works&&typeof o.works==='object')?o.works:{},w={};
@@ -614,7 +636,7 @@ function norm(o){
 }
 function renum(){var n=0;S.objects.forEach(function(o){n=Math.max(n,o.num||0)});S.objects.forEach(function(o){if(!o.num)o.num=++n})}
 function seeds(){
- var W=function(p,d,da,r,ra){return{person:p,done:!!d,doneAt:da||null,report:!!r,reportAt:ra||null}};
+ var W=function(p,d,da,r,ra){return{person:p,done:!!d,doneAt:da||null,report:!!r,reportAt:ra||null,note:''}};
  return [
  {id:uid(),num:1,customer:'СМУ-1',customerMaster:'Титов В. Н.',name:'ПС 110/10 кВ «Заречная»',kind:'ПС',dateStart:'2026-11-16',dateEnd:'2026-11-27',createdAt:today(),closedAt:null,
   works:{efi:W('Соколов А. В.',1,'2026-11-18',1,'2026-11-19'),tm:W('Мельникова И. П.'),askue:W('Гарипов Р. Н.')}},
@@ -678,7 +700,7 @@ function match(o){
  if(S.filter==='closed'&&s!=='closed')return false;
  var q=S.q.trim().toLowerCase();if(!q)return true;
  var h=[o.name,o.kind,o.customer||'',o.customerMaster||''];
- keys(o).forEach(function(k){h.push(meta(k).code,meta(k).title,o.works[k].person||'')});
+ keys(o).forEach(function(k){h.push(meta(k).code,meta(k).title,o.works[k].person||'',o.works[k].note||'')});
  return h.join(' ').toLowerCase().indexOf(q)>=0;
 }
 function sortArr(a){
@@ -713,9 +735,12 @@ function ck(o,k,f,label,cls){var w=o.works[k];
 function workHTML(o,k){var t=meta(k),w=o.works[k],p=(w.person||'').trim();
  return '<div class="w '+t.cls+(w.done?' d1':'')+(w.done&&w.report?' d2':'')+'" data-w="'+k+'">'+
  '<div class="wt"><span class="code">'+esc(t.code)+'</span><b>'+esc(t.title)+'</b>'+
+ '<button type="button" class="nt'+(w.note?' has':'')+'" data-act="note" data-id="'+o.id+'" data-w="'+k+'" aria-label="Примечание">'+ic('note')+'</button>'+
  '<button type="button" class="x" data-act="delwork" data-id="'+o.id+'" data-w="'+k+'" aria-label="Убрать '+esc(t.code)+'">'+ic('x')+'</button></div>'+
  '<div class="per"><span class="av'+(p?'':' no')+'">'+(p?esc(ini(p)):'?')+'</span><span class="nm'+(p?'':' no')+'">'+(p?esc(p):'Не назначен')+'</span><span class="rl">· '+esc(t.role)+'</span></div>'+
- '<div class="cks">'+ck(o,k,'done','Выполнено','d')+ck(o,k,'report','Отчёт выдан','r')+'</div></div>'}
+ '<div class="cks">'+ck(o,k,'done','Выполнено','d')+ck(o,k,'report','Отчёт выдан','r')+'</div>'+
+ (w.note?'<button type="button" class="wnote" data-act="note" data-id="'+o.id+'" data-w="'+k+'">'+ic('note')+'<span>'+esc(w.note)+'</span></button>':'')+
+ '</div>'}
 function cardHTML(o){
  var s=stage(o),cl=s==='closed',a=dStart(o),b=dEnd(o),ks=keys(o),st2=steps(o),bd=BADGE[s];
  var body=ks.length?ks.map(function(k){return workHTML(o,k)}).join(''):
@@ -827,7 +852,7 @@ window.addEventListener('popstate',function(e){
  S.screen=st.screen||'home';S.custId=st.custId||null;applyScreen();
 });
 /* ---------- СИНХРОНИЗАЦИЯ КОМАНДЫ (Supabase) ---------- */
-var SYNC={url:'',key:'',on:false},dirty={},dels={},syncTimer=null,pullTimer=null,swOK2=false,syncPrimed=false;
+var SYNC={url:'',key:'',on:false},dirty={},dels={},syncTimer=null,pullTimer=null,syncPrimed=false;
 var SQLTXT="create table if not exists public.pnr_objects (\n  id text primary key,\n  data jsonb not null,\n  updated_at timestamptz not null default now()\n);\nalter table public.pnr_objects enable row level security;\ndrop policy if exists \"pnr_all\" on public.pnr_objects;\ncreate policy \"pnr_all\" on public.pnr_objects for all using (true) with check (true);";
 function loadSync(){
  try{var s=JSON.parse(st.get(K.s)||'{}');SYNC.url=s.url||'';SYNC.key=s.key||'';SYNC.on=!!s.on}catch(e){}
@@ -951,15 +976,16 @@ function confetti(card){
 function party(o){var c=$('#list').querySelector('[data-id="'+o.id+'"]');
  if(c){c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');confetti(c)}
  vib([30,40,60]);toast('ok','Объект закрыт: '+o.name)}
-var SCR=['#sObj','#sCust','#sApp'],lastFocus=null;
+var SCR=['#sObj','#sCust','#sApp','#sNote'],lastFocus=null;
 function openS(sel,focus){lastFocus=document.activeElement;$(sel).hidden=false;document.documentElement.classList.add('lock');
- setTimeout(function(){var f=focus?$(focus):$(sel).querySelector('input,select,button');if(f&&f.focus)f.focus()},70)}
+ setTimeout(function(){var f=focus?$(focus):$(sel).querySelector('input,select,textarea,button');if(f&&f.focus)f.focus()},70)}
 function closeS(sel){var s=$(sel);if(s.hidden)return;s.classList.add('out');
  setTimeout(function(){s.hidden=true;s.classList.remove('out');
   if(SCR.every(function(x){return $(x).hidden}))document.documentElement.classList.remove('lock');
   if(lastFocus&&lastFocus.focus)lastFocus.focus()},180)}
 function closeTop(){for(var i=0;i<SCR.length;i++)if(!$(SCR[i]).hidden){closeS(SCR[i]);return}}
 var editId=null,FW={};
+var noteId=null,noteKey=null;
 function setSel(sel,v){var s=$(sel),has=[].some.call(s.options,function(o){return o.value===v});
  if(!has&&v){var o=document.createElement('option');o.textContent=v;o.value=v;s.appendChild(o)}s.value=v}
 function renderFW(){
@@ -981,8 +1007,8 @@ function openObj(o,opt){
  $('#fName').value=o?o.name:'';setSel('#fKind',o?o.kind:'ПС');
  $('#fStart').value=o?(o.dateStart||''):'';$('#fEnd').value=o?(o.dateEnd||''):'';
  FW={};CAT.forEach(function(t){var e=o&&o.works[t.key];
-  FW[t.key]=e?{on:true,person:e.person,done:e.done,doneAt:e.doneAt,report:e.report,reportAt:e.reportAt}:{on:false,person:'',done:false,doneAt:null,report:false,reportAt:null}});
- if(o)Object.keys(o.works).forEach(function(k){if(!FW[k]){var w=o.works[k];FW[k]={on:true,person:w.person,done:w.done,doneAt:w.doneAt,report:w.report,reportAt:w.reportAt}}});
+  FW[t.key]=e?{on:true,person:e.person,done:e.done,doneAt:e.doneAt,report:e.report,reportAt:e.reportAt,note:e.note||''}:{on:false,person:'',done:false,doneAt:null,report:false,reportAt:null,note:''}});
+ if(o)Object.keys(o.works).forEach(function(k){if(!FW[k]){var w=o.works[k];FW[k]={on:true,person:w.person,done:w.done,doneAt:w.doneAt,report:w.report,reportAt:w.reportAt,note:w.note||''}}});
  renderFW();
  $('#nCode').value='';$('#nTitle').value='';
  $('#fName').classList.remove('bad');$('#fNameErr').hidden=true;$('#fEnd').classList.remove('bad');$('#fDateErr').hidden=true;
@@ -1003,6 +1029,23 @@ function delWork(id,k){
  if(closed(o)&&!was)party(o);
  toast('bd','Вид работ убран: '+t.code,{label:'Отменить',fn:function(){var x=find(id);if(!x)return;
   x.works[k]=e;sync(x);save();render();syncAfter(x);toast('ok','Вид работ возвращён: '+t.code)}});
+}
+function openNote(id,k){
+ var o=find(id);if(!o||!o.works[k])return;
+ noteId=id;noteKey=k;
+ $('#ntText').value=o.works[k].note||'';
+ $('#ntSub').textContent=o.name+' · '+meta(k).code;
+ openS('#sNote','#ntText');
+}
+function saveNote(){
+ var o=find(noteId);
+ if(o&&o.works[noteKey]){
+  var tx=$('#ntText').value.trim();
+  o.works[noteKey].note=tx;
+  save();render();syncAfter(o);
+  toast('ok',tx?'Примечание сохранено':'Примечание удалено');
+ }
+ closeS('#sNote');
 }
 var pickId=null;
 function openCustPick(id){var o=find(id);if(!o)return;pickId=id;
@@ -1073,7 +1116,7 @@ function applyImp(mode){
 }
 function portable(){
  var root=document.documentElement.cloneNode(true);
- ['#list','#homeList','#toasts','#cf','#cuList','#fWorks','#steps','#offRows','#dataRows'].forEach(function(s){var e=root.querySelector(s);if(e)e.innerHTML=''});
+ ['#list','#homeList','#toasts','#cf','#cuList','#fWorks','#steps','#offRows','#dataRows','#ntText'].forEach(function(s){var e=root.querySelector(s);if(e)e.innerHTML=''});
  ['#empty','#homeEmpty'].forEach(function(s){var e=root.querySelector(s);if(e){e.innerHTML='';e.hidden=true}});
  SCR.forEach(function(s){var e=root.querySelector(s);if(e){e.hidden=true;e.classList.remove('out')}});
  var ib=root.querySelector('#impBox');if(ib)ib.hidden=true;
@@ -1184,7 +1227,7 @@ document.addEventListener('submit',function(e){
  if(s&&en&&pD(en)<pD(s)){var el=$('#fEnd');el.classList.add('bad');$('#fDateErr').hidden=false;el.focus();return}
  $('#fDateErr').hidden=true;$('#fEnd').classList.remove('bad');
  var w={};Object.keys(FW).forEach(function(k){var f=FW[k];
-  if(f.on)w[k]={person:(f.person||'').trim(),done:!!f.done,doneAt:f.doneAt||null,report:!!f.report,reportAt:f.reportAt||null}});
+  if(f.on)w[k]={person:(f.person||'').trim(),done:!!f.done,doneAt:f.doneAt||null,report:!!f.report,reportAt:f.reportAt||null,note:f.note||''}});
  var t,was=false;
  if(editId){t=find(editId);if(t){was=closed(t);t.name=name;t.customer=$('#fCust').value||null;t.customerMaster=$('#fMaster').value.trim();
   t.kind=$('#fKind').value;t.dateStart=s;t.dateEnd=en;t.works=w;sync(t)}}
@@ -1242,6 +1285,9 @@ document.addEventListener('click',function(e){
  else if(a==='addwork'&&o)openObj(o,{focus:'#wSec',scroll:true});
  else if(a==='delobj'){var did=id||editId;closeS('#sObj');setTimeout(function(){delObj(did)},190)}
  else if(a==='delwork')delWork(id,b.dataset.w);
+ else if(a==='note')openNote(id,b.dataset.w);
+ else if(a==='notesave')saveNote();
+ else if(a==='noteclear'){$('#ntText').value='';$('#ntText').focus()}
  else if(a==='cust')openCustPick(id);
  else if(a==='setcust')setCust(b.dataset.v);
  else if(a==='custclear')setCust(null);
@@ -1281,7 +1327,7 @@ document.addEventListener('click',function(e){
   ce.classList.remove('bad');
   var nk='c'+Date.now().toString(36);
   CAT.push({key:nk,code:code,title:title||code,role:'ответственный'});paint();saveTypes();
-  FW[nk]={on:true,person:'',done:false,doneAt:null,report:false,reportAt:null};
+  FW[nk]={on:true,person:'',done:false,doneAt:null,report:false,reportAt:null,note:''};
   renderFW();ce.value='';$('#nTitle').value='';ce.focus();toast('ok','Вид работ добавлен: '+code);
  }
  else if(a==='install'){
@@ -1293,7 +1339,7 @@ document.addEventListener('keydown',function(e){
  if(e.key==='Escape')closeTop();
  if(e.key==='/'&&!e.target.closest('input,select,textarea')&&SCR.every(function(s){return $(s).hidden})){e.preventDefault();$('#q').focus()}
  if(e.key==='Tab'){var open=SCR.filter(function(s){return !$(s).hidden})[0];if(!open)return;
-  var f=[].slice.call($(open).querySelectorAll('button,input,select,[tabindex]:not([tabindex="-1"])')).filter(function(x){return !x.hidden&&x.offsetParent!==null});
+  var f=[].slice.call($(open).querySelectorAll('button,input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(function(x){return !x.hidden&&x.offsetParent!==null});
   if(!f.length)return;var first=f[0],last=f[f.length-1];
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
