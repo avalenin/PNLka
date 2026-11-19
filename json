@@ -1,0 +1,24 @@
+{
+  "id": "./index.html",
+  "name": "ПНР Контроль — объекты, работы и отчёты",
+  "short_name": "ПНР",
+  "description": "Автономный контроль пусконаладки: заказчик и мастер, сроки ПНР, виды работ, отметки выполнения и выдачи отчётов.",
+  "lang": "ru",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "categories": ["productivity", "business", "utilities"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Новый объект", "short_name": "Объект", "url": "./index.html?action=new" },
+    { "name": "Отчёты к выдаче", "short_name": "Отчёты", "url": "./index.html?filter=reports" },
+    { "name": "Закрытые объекты", "short_name": "Закрытые", "url": "./index.html?filter=closed" }
+  ]
+}
