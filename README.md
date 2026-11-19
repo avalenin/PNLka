@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- index.html · ПНР Контроль v2.0 — сперва выбор заказчика, внутри его объекты. Один файл, заменить целиком. -->
+<!-- index.html · ПНР Контроль v2.1 — заказчики + синхронизация команды через Supabase. Один файл, заменить целиком. -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -228,7 +228,7 @@ main{padding:12px 0 120px}
 .shf{display:flex;align-items:center;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);flex:none}
 @media(min-width:640px){.scr{align-items:center;padding:22px}.sh{border-radius:22px;border-bottom:1px solid var(--ln2)}.hd{display:none}}
 .tabs{display:flex;gap:6px;padding:10px 16px 0;flex:none}
-.tb{flex:1;height:35px;border-radius:10px;font:700 10.5px var(--fm);letter-spacing:.5px;text-transform:uppercase;color:var(--dim);border:1px solid var(--ln);background:rgba(13,21,38,.6)}
+.tb{flex:1;height:35px;border-radius:10px;font:700 10px var(--fm);letter-spacing:.4px;text-transform:uppercase;color:var(--dim);border:1px solid var(--ln);background:rgba(13,21,38,.6)}
 .tb.on{color:#08130C;background:linear-gradient(135deg,#2BD9FF,#8B5CF6);border-color:transparent}
 .f{display:block;margin-bottom:13px;min-width:0}
 .f>span{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font:700 10px var(--fm);letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;line-height:1.35}
@@ -282,6 +282,7 @@ main{padding:12px 0 120px}
 .note.ok{color:#BFF5D6;background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.35)}
 .note.wn{color:#FFE2AE;background:rgba(255,178,36,.09);border:1px solid rgba(255,178,36,.35)}
 .note.dm{color:var(--dim);background:rgba(22,34,59,.5);border:1px solid var(--ln)}
+.note ol{margin:0 0 0 16px}.note li{margin-bottom:4px}
 .stp{display:flex;gap:11px;align-items:flex-start;margin-bottom:14px}
 .stp i{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:rgba(22,34,59,.7);border:1px solid var(--ln2);color:var(--cyan)}
 .stp i svg{width:19px;height:19px}
@@ -300,6 +301,8 @@ main{padding:12px 0 120px}
 .sw i:after{content:'';position:absolute;left:2px;top:2px;width:17px;height:17px;border-radius:50%;background:var(--dim);transition:.25s var(--e)}
 .sw input:checked~i{background:rgba(61,220,132,.3);border-color:rgba(61,220,132,.6)}
 .sw input:checked~i:after{left:20px;background:var(--green)}
+.sql{background:#0a101e;border:1px solid var(--ln);border-radius:10px;padding:11px;font:500 11px/1.5 var(--fm);color:#9BE8FF;overflow-x:auto;white-space:pre;margin:8px 0}
+.tlink{width:100%;height:40px;border-radius:10px;border:1px solid var(--ln);background:var(--fld);color:var(--dim);font:500 11.5px var(--fm);padding:0 11px;margin-top:8px}
 .tst{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(15px + env(safe-area-inset-bottom));z-index:300;display:flex;flex-direction:column;gap:8px;width:min(430px,calc(100vw - 22px));pointer-events:none}
 .t{pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:11px;border-radius:14px;background:rgba(19,30,54,.97);border:1px solid var(--ln2);box-shadow:0 14px 40px -10px #000;animation:in .28s var(--e)}
 .t.out{animation:fo .18s forwards}
@@ -448,7 +451,7 @@ main{padding:12px 0 120px}
   <div class="shh"><div><h2 id="cuT">Заказчик объекта</h2><p id="cuSub"></p></div>
    <button class="ib sm" data-act="close" aria-label="Закрыть"><svg class="i"><use href="#x"/></svg></button></div>
   <div class="shb"><div class="opts" id="cuList"></div>
-   <div class="note dm"><svg class="i"><use href="#bld"/></svg><span>Заказчик показан ссылкой на карточке объекта и определяет, в каком разделе находится объект.</span></div></div>
+   <div class="note dm"><svg class="i"><use href="#bld"/></svg><span>Заказчик определяет, в каком разделе находится объект.</span></div></div>
   <div class="shf"><button class="gh big" data-act="custclear">Сбросить выбор</button><div class="sp"></div>
    <button class="pri" data-act="close" style="height:42px">Готово</button></div>
  </div>
@@ -457,11 +460,12 @@ main{padding:12px 0 120px}
 <div class="scr" id="sApp" hidden>
  <div class="sh" role="dialog" aria-modal="true" aria-labelledby="apT">
   <div class="hd"></div>
-  <div class="shh"><div><h2 id="apT">Приложение</h2><p>Установка · автономность · данные</p></div>
+  <div class="shh"><div><h2 id="apT">Приложение</h2><p>Установка · автономность · база команды · данные</p></div>
    <button class="ib sm" data-act="close" aria-label="Закрыть"><svg class="i"><use href="#x"/></svg></button></div>
   <div class="tabs">
    <button class="tb on" data-act="tab" data-tab="install">Установка</button>
    <button class="tb" data-act="tab" data-tab="offline">Офлайн</button>
+   <button class="tb" data-act="tab" data-tab="sync">База</button>
    <button class="tb" data-act="tab" data-tab="data">Данные</button>
   </div>
   <div class="shb">
@@ -476,6 +480,7 @@ main{padding:12px 0 120px}
      <label class="sw"><input type="checkbox" id="withData" checked><i></i><span id="wdLabel">Включить текущие данные</span></label>
      <button class="pri" data-act="portable" style="width:100%;height:42px"><svg class="i"><use href="#dn"/></svg>Скачать автономный .html</button></div>
    </div>
+
    <div data-pane="offline" hidden><div id="offRows"></div>
     <div class="ag"><button class="gh big" data-act="checkupd"><svg class="i"><use href="#rfr"/></svg>Проверить обновления</button>
      <button class="gh big" data-act="persist"><svg class="i"><use href="#shl"/></svg>Защитить данные</button>
@@ -483,6 +488,37 @@ main{padding:12px 0 120px}
      <button class="gh big wide" data-act="rebuild"><svg class="i"><use href="#cld"/></svg>Пересобрать офлайн-копию</button></div>
     <div class="note dm"><svg class="i"><use href="#cld"/></svg><span>Офлайн на телефоне включается файлом <b>sw.js</b> рядом с index.html. Без него приложение всё равно работает, а для компьютера есть автономный .html.</span></div>
    </div>
+
+   <div data-pane="sync" hidden>
+    <div class="kv"><span>Статус базы</span><b id="syncStat" class="dm">не настроена</b></div>
+    <label class="sw"><input type="checkbox" id="syncOn"><i></i><span>Общая база для команды (синхронизация)</span></label>
+    <label class="f"><span><svg class="i"><use href="#cld"/></svg>URL проекта (… .supabase.co)</span><input id="syncUrl" type="url" placeholder="https://xxxx.supabase.co" autocomplete="off"></label>
+    <label class="f"><span>Ключ anon (public)</span><input id="syncKey" type="text" placeholder="eyJhbGciOi…" autocomplete="off"></label>
+    <div class="ag">
+     <button class="pri wide" data-act="syncTest" style="height:42px"><svg class="i"><use href="#cld"/></svg>Подключить и проверить</button>
+     <button class="gh big" data-act="syncPull"><svg class="i"><use href="#rfr"/></svg>Обновить из базы</button>
+    </div>
+    <div class="note ok" id="teamLinkBox" hidden>
+     <svg class="i"><use href="#shr"/></svg>
+     <span>Ссылка для сотрудников — открывает приложение сразу с общей базой. Настройка у них не нужна.
+      <input class="tlink" id="teamLink" type="text" readonly>
+      <span class="ag" style="margin-top:8px"><button class="gh big wide" data-act="copyTeam"><svg class="i"><use href="#shr"/></svg>Скопировать ссылку</button></span>
+     </span></div>
+    <div class="note dm"><svg class="i"><use href="#cld"/></svg><span>Все, кто откроет эту ссылку, видят одни и те же объекты и могут отмечать «Выполнено» и «Отчёт выдан». Изменения появляются у остальных в течение нескольких секунд. Локальная копия тоже сохраняется, поэтому без интернета приложение продолжает работать.</span></div>
+    <div class="sec"><h4>Как настроить базу (однократно, 5 минут)</h4>
+     <div class="note dm"><svg class="i"><use href="#db"/></svg><span><ol>
+      <li>Зарегистрируйтесь на <b>supabase.com</b> (бесплатно) и создайте проект. Придумайте пароль базы и выберите регион.</li>
+      <li>Дождитесь создания проекта. Слева откройте <b>SQL Editor</b> → <b>New query</b>.</li>
+      <li>Вставьте SQL ниже и нажмите <b>Run</b>.</li>
+      <li>Слева: <b>Project Settings</b> (шестерёнка) → <b>API</b>. Скопируйте <b>Project URL</b> и ключ <b>anon public</b>.</li>
+      <li>Вставьте их в поля выше и нажмите «Подключить и проверить».</li>
+      <li>Скопируйте «Ссылку для сотрудников» и разошлите команде.</li>
+     </ol></span></div>
+     <pre class="sql" id="sqlBox"></pre>
+     <button class="gh big" data-act="copySql"><svg class="i"><use href="#up"/></svg>Скопировать SQL</button>
+    </div>
+   </div>
+
    <div data-pane="data" hidden><div id="dataRows"></div>
     <div class="ag"><button class="gh big" data-act="export"><svg class="i"><use href="#dn"/></svg>Экспорт JSON</button>
      <button class="gh big" data-act="import"><svg class="i"><use href="#up"/></svg>Импорт JSON</button>
@@ -492,7 +528,7 @@ main{padding:12px 0 120px}
     <div class="note wn" id="impBox" hidden><svg class="i"><use href="#up"/></svg><span><b id="impInfo"></b>
      <span class="ag" style="margin-top:9px"><button class="pri" data-act="impreplace" style="height:38px">Заменить всё</button>
       <button class="gh" data-act="impmerge">Добавить</button><button class="gh wide" data-act="impcancel">Отмена</button></span></span></div>
-    <div class="note dm"><svg class="i"><use href="#db"/></svg><span>Перенос между телефоном и компьютером: экспорт JSON на одном устройстве → импорт на другом.</span></div>
+    <div class="note dm"><svg class="i"><use href="#db"/></svg><span>Перенос между телефоном и компьютером: экспорт JSON на одном устройстве → импорт на другом. При включённой общей базе перенос не нужен — всё синхронизируется само.</span></div>
     <input type="file" id="impFile" accept="application/json,.json" hidden>
    </div>
   </div>
@@ -506,17 +542,13 @@ main{padding:12px 0 120px}
 
 <script>
 window.__PNR={ok:false,err:[]};
-window.addEventListener('error',function(e){
- try{window.__PNR.err.push((e.message||'Ошибка')+(e.lineno?' строка '+e.lineno:''));
- if(!window.__PNR.ok){var b=document.getElementById('bootFail'),m=document.getElementById('bootMsg');
- if(b)b.hidden=false;if(m)m.textContent='Технически: '+window.__PNR.err.join(' | ');}}catch(_){}
-});
+window.addEventListener('error',function(e){try{window.__PNR.err.push((e.message||'Ошибка')+(e.lineno?' строка '+e.lineno:''))}catch(_){}});
 </script>
 
 <script>
 (function(){
 'use strict';
-var V='2.0.0',K={d:'pnr-objects-v1',u:'pnr-ui-v2',t:'pnr-types-v1',m:'pnr-meta-v1'};
+var V='2.1.0',K={d:'pnr-objects-v1',u:'pnr-ui-v2',t:'pnr-types-v1',m:'pnr-meta-v1',s:'pnr-sync-v1'};
 var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 var ic=function(n,c){return '<svg class="i '+(c||'')+'" aria-hidden="true"><use href="#'+n+'"/></svg>'};
@@ -525,6 +557,7 @@ var uid=function(){return 'o'+Date.now().toString(36)+Math.random().toString(36)
 var pad=function(n){return (n<10?'0':'')+n};
 var today=function(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 var fmt=function(s){if(!s)return'';var p=String(s).slice(0,10).split('-');return p.length<3?'':p[2]+'.'+p[1]+(p[0]!=String(new Date().getFullYear())?'.'+p[0].slice(2):'')};
+var fmtTime=function(ts){if(!ts)return'—';var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var pD=function(s){var p=String(s).slice(0,10).split('-');return new Date(+p[0],+p[1]-1,+p[2])};
 var left=function(s){var t=new Date();t.setHours(0,0,0,0);return Math.round((pD(s)-t)/864e5)};
 var pl=function(n,a,b,c){n=Math.abs(n)%100;var d=n%10;if(n>10&&n<20)return c;if(d==1)return a;if(d>1&&d<5)return b;return c};
@@ -576,7 +609,7 @@ function norm(o){
   if(!('report' in old)&&was){v.report=true;v.reportAt=o.closedAt||today()}w[k]=v});
  var r={id:o.id||uid(),num:+o.num||0,customer:o.customer||null,customerMaster:typeof o.customerMaster==='string'?o.customerMaster:'',
   name:String(o.name||'Без наименования'),kind:o.kind||'ПС',dateStart:o.dateStart||null,dateEnd:o.dateEnd||o.deadline||null,
-  createdAt:o.createdAt||today(),closedAt:o.closedAt||null,works:w};
+  createdAt:o.createdAt||today(),closedAt:o.closedAt||null,works:w,_ts:o._ts||'',_dirty:!!o._dirty};
  sync(r);return r;
 }
 function renum(){var n=0;S.objects.forEach(function(o){n=Math.max(n,o.num||0)});S.objects.forEach(function(o){if(!o.num)o.num=++n})}
@@ -768,6 +801,7 @@ function render(){
  if(S.screen==='cust'&&S.custId!=null)renderCust();else renderHome();
  refreshBar();
 }
+var syncMsg='не настроена',syncCls='dm',lastPull=0;
 function refreshBar(){
  var on=navigator.onLine!==false,d=$('#sbDot'),t=$('#sbTx');
  var txt,cls;
@@ -775,7 +809,8 @@ function refreshBar(){
  else if(!swOK){cls='wn';txt=on?'Работает локально · офлайн-копия не подключена':'Нет сети · данные сохранены локально'}
  else{cls='ok';txt=on?'Готово к работе без интернета':'Нет сети · работает автономно'}
  if(updWait){cls='wn';txt='Доступно обновление приложения'}
- d.className='d '+cls;t.textContent=txt+' · объектов: '+S.objects.length;
+ var synctext=syncReady()?(' · база: '+syncMsg):'';
+ d.className='d '+cls;t.textContent=txt+' · объектов: '+S.objects.length+synctext;
  var ad=$('#appDot');if(ad)ad.className='dot '+(updWait?'wn':cls);
  $('#ftTx').textContent='ПНР Контроль v'+V+' · '+(ISFILE?'локальный файл':'данные на устройстве');
  $('#updBtn').hidden=!updWait;
@@ -791,6 +826,115 @@ window.addEventListener('popstate',function(e){
  var st=(e&&e.state)||{screen:'home',custId:null};
  S.screen=st.screen||'home';S.custId=st.custId||null;applyScreen();
 });
+/* ---------- СИНХРОНИЗАЦИЯ КОМАНДЫ (Supabase) ---------- */
+var SYNC={url:'',key:'',on:false},dirty={},dels={},syncTimer=null,pullTimer=null,swOK2=false,syncPrimed=false;
+var SQLTXT="create table if not exists public.pnr_objects (\n  id text primary key,\n  data jsonb not null,\n  updated_at timestamptz not null default now()\n);\nalter table public.pnr_objects enable row level security;\ndrop policy if exists \"pnr_all\" on public.pnr_objects;\ncreate policy \"pnr_all\" on public.pnr_objects for all using (true) with check (true);";
+function loadSync(){
+ try{var s=JSON.parse(st.get(K.s)||'{}');SYNC.url=s.url||'';SYNC.key=s.key||'';SYNC.on=!!s.on}catch(e){}
+ try{var qs=new URLSearchParams(location.search),sb=qs.get('sb');
+  if(sb){var cfg=JSON.parse(decodeURIComponent(escape(atob(sb))));
+   if(cfg&&cfg.url&&cfg.key){SYNC.url=cfg.url;SYNC.key=cfg.key;SYNC.on=true;saveSync();
+    try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(e){}}}}catch(e){}
+}
+function saveSync(){st.set(K.s,JSON.stringify(SYNC))}
+function syncReady(){return SYNC.on&&SYNC.url&&SYNC.key}
+function sbase(){return SYNC.url.replace(/\/+$/,'')}
+function shdr(extra){var h={'apikey':SYNC.key,'Authorization':'Bearer '+SYNC.key,'Content-Type':'application/json'};
+ if(extra)for(var k in extra)h[k]=extra[k];return h}
+function apiFetch(path,method,body,prefer){
+ return fetch(sbase()+'/rest/v1/'+path,{method:method||'GET',headers:shdr(prefer?{'Prefer':prefer}:null),body:body?JSON.stringify(body):undefined});
+}
+function apiPull(){return apiFetch('pnr_objects?select=id,data,updated_at','GET')}
+function cleanObj(o){var c=cp(o);delete c._dirty;return c}
+function apiPush(o){return apiFetch('pnr_objects','POST',{id:o.id,data:cleanObj(o),updated_at:o._ts},'resolution=merge-duplicates,return=minimal')}
+function apiDel(id){return apiFetch('pnr_objects?id=eq.'+encodeURIComponent(id),'DELETE',null,'return=minimal')}
+function syncStatus(m,c){syncMsg=m;syncCls=c;var e=$('#syncStat');if(e){e.textContent=m;e.className=c}}
+function scheduleSync(){if(!syncReady())return;clearTimeout(syncTimer);syncTimer=setTimeout(runSync,350)}
+function runSync(){
+ if(!syncReady())return;
+ if(navigator.onLine===false){syncStatus('офлайн — отправим при сети','wn');refreshBar();return}
+ var delIds=Object.keys(dels),chain=Promise.resolve();
+ delIds.forEach(function(id){chain=chain.then(function(){return apiDel(id).then(function(r){if(r.ok||r.status===204||r.status===404||r.status===406)delete dels[id]}).catch(function(){})})});
+ chain.then(function(){
+  var ids=Object.keys(dirty),p=Promise.resolve();
+  ids.forEach(function(id){var o=find(id);if(!o){delete dirty[id];return}
+   p=p.then(function(){return apiPush(o).then(function(r){if(r.ok||r.status===201||r.status===204){delete dirty[id];o._dirty=false}}).catch(function(){})})});
+  return p;
+ }).then(function(){
+  var pend=Object.keys(dirty).length+Object.keys(dels).length;
+  if(pend===0){syncPrimed=true;lastPull=Date.now();syncStatus('синхронизировано · '+fmtTime(lastPull),'ok');doPull()}
+  else syncStatus('ожидание отправки ('+pend+')','wn');
+  refreshBar();
+ });
+}
+function doPull(){
+ if(!syncReady())return;
+ apiPull().then(function(r){
+  if(!r.ok){if(r.status===404||r.status===400)syncStatus('таблица не найдена — выполните SQL','bd');
+   else if(r.status===401||r.status===403)syncStatus('неверный ключ','bd');
+   else syncStatus('ошибка базы ('+r.status+')','bd');refreshBar();return null}
+  return r.json();
+ }).then(function(rows){
+  if(!rows||!Array.isArray(rows))return;
+  if(rows.length===0&&S.objects.length>0&&!syncPrimed){
+   S.objects.forEach(function(o){o._ts=o._ts||new Date().toISOString();o._dirty=true;dirty[o.id]=true});
+   scheduleSync();return;
+  }
+  var remote={},changed=false;
+  rows.forEach(function(r){remote[r.id]=r});
+  rows.forEach(function(r){
+   var loc=find(r.id),rd=r.data||{};rd.id=r.id;var ru=r.updated_at||'';
+   if(!loc){S.objects.push(norm(rd));changed=true}
+   else if(!loc._dirty&&ru>(loc._ts||'')){var idx=S.objects.indexOf(loc);var n=norm(rd);n._ts=ru;S.objects[idx]=n;changed=true}
+  });
+  if(syncPrimed){
+   for(var i=S.objects.length-1;i>=0;i--){var o=S.objects[i];
+    if(!remote[o.id]&&!o._dirty){S.objects.splice(i,1);changed=true}}
+  }
+  if(changed){renum();save();render()}
+  lastPull=Date.now();
+  var pend=Object.keys(dirty).length+Object.keys(dels).length;
+  if(pend===0)syncStatus('синхронизировано · '+fmtTime(lastPull),'ok');
+  refreshBar();
+ }).catch(function(){syncStatus('нет связи с базой','wn');refreshBar()});
+}
+function syncAfter(o){if(!syncReady())return;if(o){o._ts=new Date().toISOString();o._dirty=true;dirty[o.id]=true;delete dels[o.id]}scheduleSync()}
+function syncAfterDelete(id){if(!syncReady())return;dels[id]=true;delete dirty[id];scheduleSync()}
+function syncResyncAll(prevIds){
+ if(!syncReady())return;
+ if(prevIds)prevIds.forEach(function(id){if(!find(id))dels[id]=true});
+ S.objects.forEach(function(o){o._ts=o._ts||new Date().toISOString();o._dirty=true;dirty[o.id]=true;delete dels[o.id]});
+ scheduleSync();
+}
+function startPoll(){stopPoll();if(!syncReady())return;doPull();pullTimer=setInterval(function(){doPull()},5000)}
+function stopPoll(){if(pullTimer){clearInterval(pullTimer);pullTimer=null}}
+function teamLink(){var cfg={url:SYNC.url,key:SYNC.key};
+ var b=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+ return location.origin+location.pathname+'?sb='+b}
+function showTeamLink(){var box=$('#teamLinkBox');if(!box)return;
+ if(syncReady()){box.hidden=false;$('#teamLink').value=teamLink()}else box.hidden=true}
+function syncTest(){
+ SYNC.url=$('#syncUrl').value.trim();SYNC.key=$('#syncKey').value.trim();SYNC.on=true;saveSync();
+ syncStatus('проверяю подключение…','wn');refreshBar();
+ apiPull().then(function(r){
+  if(r.ok){syncPrimed=false;syncStatus('подключено ✓','ok');startPoll();showTeamLink();toast('ok','База подключена')}
+  else if(r.status===404||r.status===400){syncStatus('таблица не найдена — выполните SQL','bd');stopPoll()}
+  else if(r.status===401||r.status===403){syncStatus('неверный ключ','bd');stopPoll()}
+  else{syncStatus('ошибка '+r.status,'bd');stopPoll()}
+  refreshBar();
+ }).catch(function(){syncStatus('нет связи (проверьте URL)','bd');refreshBar()});
+}
+function copyText(t,ok){
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('ok',ok||'Скопировано')}).catch(function(){fallbackCopy(t,ok)})}
+ else fallbackCopy(t,ok);
+}
+function fallbackCopy(t,ok){
+ var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+ document.body.appendChild(ta);ta.select();
+ try{document.execCommand('copy');toast('ok',ok||'Скопировано')}catch(e){toast('wn','Не удалось скопировать')}
+ ta.remove();
+}
+/* ---------- конец блока синхронизации ---------- */
 function confetti(card){
  if(RM||!card)return;var L=$('#cf'),r=card.getBoundingClientRect(),cx=r.left+r.width/2,cy=Math.max(70,r.top+60);
  var cols=['#3DDC84','#A3F7BF','#FFB224','#2BD9FF','#B78CFF','#FF4FD8','#EAF1FF'];
@@ -849,16 +993,16 @@ function openObj(o,opt){
 function find(id){for(var i=0;i<S.objects.length;i++)if(S.objects[i].id===id)return S.objects[i];return null}
 function delObj(id){
  var i=-1;S.objects.forEach(function(o,k){if(o.id===id)i=k});if(i<0)return;
- var o=S.objects[i];S.objects.splice(i,1);save();render();
- toast('bd','Удалено: '+o.name,{label:'Отменить',fn:function(){S.objects.splice(Math.min(i,S.objects.length),0,o);save();render();toast('ok','Объект восстановлен')}});
+ var o=S.objects[i];S.objects.splice(i,1);save();render();syncAfterDelete(o.id);
+ toast('bd','Удалено: '+o.name,{label:'Отменить',fn:function(){S.objects.splice(Math.min(i,S.objects.length),0,o);save();render();syncAfter(o);toast('ok','Объект восстановлен')}});
 }
 function delWork(id,k){
  var o=find(id);if(!o||!o.works[k])return;
  var e=cp(o.works[k]),t=meta(k),was=closed(o);
- delete o.works[k];sync(o);save();render();
+ delete o.works[k];sync(o);save();render();syncAfter(o);
  if(closed(o)&&!was)party(o);
  toast('bd','Вид работ убран: '+t.code,{label:'Отменить',fn:function(){var x=find(id);if(!x)return;
-  x.works[k]=e;sync(x);save();render();toast('ok','Вид работ возвращён: '+t.code)}});
+  x.works[k]=e;sync(x);save();render();syncAfter(x);toast('ok','Вид работ возвращён: '+t.code)}});
 }
 var pickId=null;
 function openCustPick(id){var o=find(id);if(!o)return;pickId=id;
@@ -866,7 +1010,7 @@ function openCustPick(id){var o=find(id);if(!o)return;pickId=id;
  var cnt={};CUST.forEach(function(x){cnt[x]=0});S.objects.forEach(function(x){if(cnt.hasOwnProperty(x.customer))cnt[x.customer]++});
  var extra=(o.customer&&CUST.indexOf(o.customer)<0)?[o.customer]:[];
  var opts=CUST.concat(extra);
- $('#cuList').innerHTML=opts.map(function(x,i){var n=cnt[x]||0;
+ $('#cuList').innerHTML=opts.map(function(x){var n=cnt[x]||0;
   return '<button type="button" class="opt '+custCls(x)+(o.customer===x?' cur':'')+'" data-act="setcust" data-v="'+esc(x)+'">'+
   '<i></i><b>'+esc(x)+'</b><s>'+n+' '+pl(n,'объект','объекта','объектов')+'</s><u>'+ic('ok')+'</u></button>'}).join('')
   +'<button type="button" class="opt cx'+((!o.customer)?' cur':'')+'" data-act="setcust" data-v="">'+
@@ -874,7 +1018,7 @@ function openCustPick(id){var o=find(id);if(!o)return;pickId=id;
  openS('#sCust','#cuList .opt');
 }
 function setCust(v){var o=find(pickId);if(!o){closeS('#sCust');return}
- o.customer=v||null;save();closeS('#sCust');render();vib(15);
+ o.customer=v||null;save();closeS('#sCust');render();syncAfter(o);vib(15);
  toast('ok',v?('Заказчик '+v+' · '+o.name):('Заказчик сброшен · '+o.name));
 }
 function dl(name,text,mime){
@@ -887,13 +1031,17 @@ function exportJSON(){
   customers:CUST,types:CAT.map(function(t){return{key:t.key,code:t.code,title:t.title,role:t.role}}),objects:S.objects},null,2),'application/json');
  toast('ok','Экспортировано объектов: '+S.objects.length);
 }
-function demo(){var p=cp(S.objects);S.objects=seeds();save();render();
- toast('wn','Демо-данные восстановлены',{label:'Отменить',fn:function(){S.objects=p;save();render();toast('ok','Ваши данные возвращены')}})}
-function repair(){var p=cp(S.objects);S.objects=seeds();renum();save();S.filter='all';S.q='';$('#q').value='';$('#qx').hidden=true;saveUI();render();
- toast('ok','Данные пересобраны и приложение работает',{label:'Вернуть было',fn:function(){S.objects=p;save();render()}})}
+function demo(){var p=cp(S.objects),prev=S.objects.map(function(o){return o.id});
+ S.objects=seeds();save();render();syncResyncAll(prev);
+ toast('wn','Демо-данные восстановлены',{label:'Отменить',fn:function(){var pv=S.objects.map(function(o){return o.id});S.objects=p;save();render();syncResyncAll(pv);toast('ok','Ваши данные возвращены')}})}
+function repair(){var prev=S.objects.map(function(o){return o.id});
+ S.objects=seeds();renum();save();S.filter='all';S.q='';$('#q').value='';$('#qx').hidden=true;saveUI();render();syncResyncAll(prev);
+ toast('ok','Данные пересобраны и приложение работает')}
 function wipe(){if(!S.objects.length){toast('info','Список уже пуст');return}
- var p=cp(S.objects),n=p.length;S.objects=[];save();render();
- toast('bd','Удалено объектов: '+n,{label:'Отменить',fn:function(){S.objects=p;save();render();toast('ok','Все объекты восстановлены')}},8000)}
+ var p=cp(S.objects),ids=S.objects.map(function(o){return o.id});
+ S.objects=[];save();render();
+ if(syncReady()){ids.forEach(function(id){dels[id]=true});scheduleSync()}
+ toast('bd','Удалено объектов: '+ids.length,{label:'Отменить',fn:function(){S.objects=p;save();render();syncResyncAll([]);toast('ok','Все объекты восстановлены')}},8000)}
 var pend=null;
 function readImp(file){
  var r=new FileReader();
@@ -909,7 +1057,7 @@ function readImp(file){
  r.onerror=function(){toast('wn','Ошибка чтения файла')};r.readAsText(file);
 }
 function applyImp(mode){
- if(!pend)return;var p=cp(S.objects),pt=cp(CAT);
+ if(!pend)return;var p=cp(S.objects),pt=cp(CAT),prev=S.objects.map(function(o){return o.id});
  pend.types.forEach(function(t){if(!CAT.some(function(x){return x.key===t.key||String(x.code).toLowerCase()===String(t.code).toLowerCase()}))
   CAT.push({key:t.key,code:t.code,title:t.title||t.code,role:t.role||'ответственный'})});
  paint();saveTypes();
@@ -918,9 +1066,10 @@ function applyImp(mode){
   pend.objects.forEach(function(o){if(ids[o.id])o.id=uid();S.objects.push(o)})}
  renum();S.objects.forEach(sync);
  S.filter='all';S.q='';$('#q').value='';$('#qx').hidden=true;saveUI();save();render();
+ if(mode==='replace')syncResyncAll(prev);else syncResyncAll([]);
  var n=pend.objects.length;pend=null;$('#impBox').hidden=true;
  toast('ok',(mode==='replace'?'Заменено на ':'Добавлено ')+n+' '+pl(n,'объект','объекта','объектов'),
-  {label:'Отменить',fn:function(){S.objects=p;CAT=pt;paint();saveTypes();save();render();toast('ok','Импорт отменён')}},8000);
+  {label:'Отменить',fn:function(){var pv=S.objects.map(function(o){return o.id});S.objects=p;CAT=pt;paint();saveTypes();save();render();syncResyncAll(pv);toast('ok','Импорт отменён')}},8000);
 }
 function portable(){
  var root=document.documentElement.cloneNode(true);
@@ -955,7 +1104,7 @@ var STEPS={
  file:[['fld','Скачайте автономную копию','Кнопка ниже сохранит один файл .html со всем приложением.'],
   ['shr','Перенесите на компьютер','Флешка, почта, сетевая папка — интернет не нужен.'],
   ['play','Двойной клик по файлу','Откроется в браузере и работает полностью локально.'],
-  ['db','Данные — в браузере','Для переноса между устройствами: экспорт и импорт JSON.']]};
+  ['db','Данные — в браузере','Для общей базы команды используйте вкладку «База».']]};
 function setPlat(p){
  $$('#plat .sg').forEach(function(b){b.classList.toggle('on',b.dataset.plat===p)});
  $('#steps').innerHTML=(STEPS[p]||STEPS.desktop).map(function(s){
@@ -965,7 +1114,7 @@ function setTab(t){
  $$('.tb').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t)});
  $$('[data-pane]').forEach(function(p){p.hidden=p.dataset.pane!==t});
  $('#sApp .shb').scrollTop=0;
- if(t==='offline')offRows();if(t==='data')dataRows();
+ if(t==='offline')offRows();if(t==='data')dataRows();if(t==='sync')syncPaneInit();
 }
 function plat(){var u=navigator.userAgent||'';
  if(/iPhone|iPad|iPod/i.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))return'ios';
@@ -975,7 +1124,7 @@ var swOK=false,swReg=null,updWait=false,persist=false,deferred=null,reloading=fa
 function offRows(){
  var rows=[['Режим',ISFILE?'локальный файл':(location.protocol==='https:'?'HTTPS':'HTTP'),ISFILE?'wn':'ok'],
   ['Файл sw.js',swOK?'подключён ✓':'не найден',swOK?'ok':'wn'],
-  ['Офлайн на телефоне',swOK?'включён':'нужен sw.js',swOK?'ok':'wn'],
+  ['База команды',syncReady()?('включена'):('выключена'),syncReady()?'ok':'dm'],
   ['Автономный .html','доступен всегда','ok'],
   ['Сеть',navigator.onLine!==false?'онлайн':'офлайн',navigator.onLine!==false?'ok':'wn'],
   ['Защита хранилища',persist?'включена':'не запрошена',persist?'ok':'dm'],
@@ -992,6 +1141,10 @@ function dataRows(){
   ['Хранилище',memOnly?'временное (сделайте экспорт)':'на устройстве',memOnly?'bd':'ok'],
   ['Ошибок при запуске',String(window.__PNR.err.length),window.__PNR.err.length?'bd':'ok']];
  $('#dataRows').innerHTML=rows.map(function(r){return '<div class="kv"><span>'+esc(r[0])+'</span><b class="'+r[2]+'">'+esc(r[1])+'</b></div>'}).join('');
+}
+function syncPaneInit(){
+ $('#syncUrl').value=SYNC.url;$('#syncKey').value=SYNC.key;$('#syncOn').checked=SYNC.on;
+ $('#sqlBox').textContent=SQLTXT;syncStatus(syncMsg,syncCls);showTeamLink();
 }
 function openApp(tab){
  $('#fileNote').hidden=!ISFILE;
@@ -1019,8 +1172,9 @@ function initSW(){
 function apply(){if(swReg&&swReg.waiting){reloading=true;swReg.waiting.postMessage({type:'SKIP_WAITING'})}else location.reload()}
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;$('#instBtn').hidden=standalone();$('#instBtn').innerHTML=ic('dn')+'Установить'});
 window.addEventListener('appinstalled',function(){deferred=null;toast('ok','Приложение установлено');refreshBar()});
-window.addEventListener('online',function(){toast('ok','Сеть восстановлена');refreshBar()});
+window.addEventListener('online',function(){toast('ok','Сеть восстановлена');if(syncReady()){runSync();doPull()}refreshBar()});
 window.addEventListener('offline',function(){toast('info','Нет сети — приложение продолжает работать');refreshBar()});
+window.addEventListener('focus',function(){if(syncReady())doPull()});
 document.addEventListener('submit',function(e){
  if(e.target.id!=='objForm')return;e.preventDefault();
  var nameEl=$('#fName'),name=nameEl.value.trim();
@@ -1037,9 +1191,10 @@ document.addEventListener('submit',function(e){
  else{t={id:uid(),num:S.objects.reduce(function(m,o){return Math.max(m,o.num||0)},0)+1,customer:$('#fCust').value||null,
   customerMaster:$('#fMaster').value.trim(),name:name,kind:$('#fKind').value,dateStart:s,dateEnd:en,createdAt:today(),closedAt:null,works:w};
   sync(t);S.objects.unshift(t)}
- save();closeS('#sObj');
- if(S.screen==='home'&&t){setScreen('cust',t.customer||'none',true);toast('ok',editId?'Изменения сохранены':'Объект добавлен: '+name)}
- else{render();toast('ok',editId?'Изменения сохранены':'Объект добавлен: '+name)}
+ save();closeS('#sObj');syncAfter(t);
+ if(S.screen==='home'&&t)setScreen('cust',t.customer||'none',true);
+ else render();
+ toast('ok',editId?'Изменения сохранены':'Объект добавлен: '+name);
  if(t){var c=$('#list').querySelector('[data-id="'+t.id+'"]');
   if(c){setTimeout(function(){c.scrollIntoView({block:'nearest',behavior:RM?'auto':'smooth'})},60);
    if(closed(t)&&!was)setTimeout(function(){party(t)},250)}}
@@ -1052,7 +1207,7 @@ document.addEventListener('change',function(e){
   var was=closed(o);sync(o);save();
   var card=t.closest('.card');
   if(card){card.outerHTML=cardHTML(o);card=$('#list').querySelector('[data-id="'+o.id+'"]')}
-  renderCust();
+  renderCust();syncAfter(o);
   if(closed(o)&&!was)party(o);
   else if(!closed(o)&&was)toast('info','Объект возвращён в работу: '+o.name);
   else vib(16);
@@ -1062,6 +1217,11 @@ document.addEventListener('change',function(e){
  if(t.classList.contains('wtc')){var k=t.dataset.k;if(FW[k]){FW[k].on=t.checked;t.closest('.wtr').classList.toggle('on',t.checked)}return}
  if(t.id==='sort'){S.sort=t.value;saveUI();render();return}
  if(t.id==='impFile'){var fl=t.files&&t.files[0];t.value='';if(fl)readImp(fl);return}
+ if(t.id==='syncOn'){SYNC.on=t.checked;saveSync();
+  if(SYNC.on&&SYNC.url&&SYNC.key){startPoll();showTeamLink()}else{stopPoll();$('#teamLinkBox').hidden=true}
+  syncStatus(SYNC.on?(syncMsg):'выключена',SYNC.on?syncCls:'dm');refreshBar();return}
+ if(t.id==='syncUrl'){SYNC.url=t.value.trim();saveSync();return}
+ if(t.id==='syncKey'){SYNC.key=t.value.trim();saveSync();return}
 });
 document.addEventListener('input',function(e){
  var t=e.target;
@@ -1100,6 +1260,10 @@ document.addEventListener('click',function(e){
  else if(a==='repair')repair();
  else if(a==='wipe')wipe();
  else if(a==='portable')portable();
+ else if(a==='syncTest')syncTest();
+ else if(a==='syncPull'){if(syncReady()){syncStatus('обновляю…','wn');doPull()}else toast('info','Сначала подключите базу')}
+ else if(a==='copyTeam'){var l=$('#teamLink').value;if(l)copyText(l,'Ссылка скопирована — отправьте её сотрудникам')}
+ else if(a==='copySql')copyText(SQLTXT,'SQL скопирован');
  else if(a==='checkupd'){if(swReg)swReg.update().then(function(){toast('ok',updWait?'Найдено обновление':'Установлена последняя версия')}).catch(function(){toast('wn','Нет сети для проверки')});
   else toast('info',ISFILE?'Автономный файл обновляется заменой самого файла':'Файл sw.js не подключён')}
  else if(a==='applyupd')apply();
@@ -1135,13 +1299,14 @@ document.addEventListener('keydown',function(e){
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
 });
 try{
- boot();
+ boot();loadSync();
  $('#sort').value=S.sort;
  var h=location.hash||'',m=h.match(/^#c\/(.+)$/);
  if(m){S.screen='cust';S.custId=decodeURIComponent(m[1])}
  try{history.replaceState({screen:S.screen,custId:S.custId},'','#'+(S.screen==='cust'?'c/'+encodeURIComponent(S.custId||'none'):''))}catch(e){}
  applyScreen();
  window.__PNR.ok=true;
+ if(syncReady()){syncStatus('подключена','ok');startPoll()}
  try{
   var c=document.createElement('canvas');c.width=c.height=180;var x=c.getContext('2d');
   var g=x.createLinearGradient(0,0,180,180);g.addColorStop(0,'#121E36');g.addColorStop(1,'#080D18');x.fillStyle=g;x.fillRect(0,0,180,180);
@@ -1163,7 +1328,7 @@ try{
 }catch(err){
  window.__PNR.err.push(String(err&&err.message||err));
  try{S.objects=seeds();render()}catch(e2){}
- toast('bd','Ошибка запуска: '+String(err&&err.message||err),{label:'Починить данные',fn:repair},10000);
+ toast('bd','Ошибка запуска: '+String(err&&err.message||err),null,10000);
 }
 })();
 </script>
